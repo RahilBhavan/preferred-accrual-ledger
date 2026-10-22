@@ -15,6 +15,7 @@ SEC = "https://www.sec.gov/Archives/edgar/data/1050446"
 
 PROXY = f"{SEC}/000119312526413159/d503578ddef14a.htm"          # DEF 14A, 2026-10-05
 TENQ = f"{SEC}/000105044626000044/mstr-20260630.htm"           # 10-Q, quarter ended 2026-06-30
+TENQ_Q1 = f"{SEC}/000105044626000031/mstr-20260331.htm"        # 10-Q, quarter ended 2026-03-31
 EX42 = f"{SEC}/000105044626000020/ex42descriptionofregistere.htm"  # 10-K 2025, Ex. 4.2
 STRE_COD = f"{SEC}/000119312525280178/d205736dex31.htm"         # STRE CoD, 8-K 2025-11-13
 DECL_NOV_DAILY = f"{SEC}/000119312526423400/mstr-20261015.htm"   # 8-K 2026-10-15

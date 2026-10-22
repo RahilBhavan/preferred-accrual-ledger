@@ -56,3 +56,10 @@ substituted into calculation inputs. September coupons hold June principal
 constant and exclude unestablished conversions, special interest and cash timing.
 Unknown inputs are explicit. Bridges share the frozen historical scope across
 current/approved scenarios and do not depend on CLI projection dates.
+
+Each bridge also has `open_reason`, one line naming what a primary source would
+have to show to close it, and `filed_evidence`, a possibly empty list of filed
+figures set beside the model. Each item has `label,filed,unit,model_low,model_high,consistent,source_url,form,accession,filing_date,note`.
+`consistent` allows the filed figure's rounding. Form, accession and filing date
+come from the cached EDGAR submissions index. Filed evidence never changes a raw
+check, a residual or `status`.

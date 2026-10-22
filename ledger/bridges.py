@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import re
 from decimal import Decimal as D
 
@@ -10,7 +11,7 @@ from .engine import replay
 from .events import Event
 from .fetch import RAW
 from .seed import LEDGER_START, _meta, build_events
-from .terms import TENQ
+from .terms import PROXY, TENQ, TENQ_Q1
 
 
 def component(label, kind, low, high, inputs, source_urls):
@@ -56,7 +57,7 @@ def fx_bridge(check):
     return finish_bridge(check, f'stre-{pay:%Y-%m}', D(1000), [comp],
                          dict(record_date=str(rec.obligation.record_date), nominal_payment_date=str(rec.obligation.nominal_pay_date),
                               adjusted_payment_date=str(pay)),
-                         ['Actual payment-time company FX', 'Actual earlier record-date shares; June closing shares assumed'],
+                         ['Actual payment-time company FX', 'Record-date shares; June closing shares assumed'],
                          dict(implied_usd_per_eur=check.reported * 1000 / euro,
                               implied_fx_basis='Diagnostic from reported USD / assumed EUR entitlement; not observed FX',
                               reported_basis='Q1 = six-month less Q2 rounded totals' if pay.month == 3 else 'Direct Q2 rounded total'))
@@ -75,6 +76,70 @@ def september_coupons():
                                   contractual_coupon_date='2026-09-15',
                                   assumption='June principal held constant; regular interest only; cash date unverified'), [TENQ]))
     return out
+
+
+SUBMISSIONS = RAW / 'edgar/submissions-CIK0001050446.json'
+
+# One line per open gap: what a primary source would have to show to close it.
+OPEN_REASONS = {
+    'stre-2026-03': 'No filing gives the USD/EUR rate Strategy paid at, and the Q1 and Q2 10-Qs disagree on Q1 STRE cash.',
+    'stre-2026-06': 'No filing gives the USD/EUR rate Strategy paid at on 2026-06-30.',
+    'strc-funding-2026-08-17': 'Funding exceeds the entitlement on the most shares the filings allow; no filing ties it to the payment.',
+    'strc-funding-2026-09-21': 'Needs 2026-08-31 STRC record shares and the debt interest actually paid; no filing gives either.',
+    'strc-funding-2026-10-19': 'Needs 2026-09-30 STRC shares outstanding; the Q3 2026 10-Q was not on EDGAR on 2026-10-22.',
+}
+
+
+def filing(url):
+    """Form, accession and filing date from the cached EDGAR submissions index."""
+    accession = '-'.join(re.search(r'/(\d{10})(\d{2})(\d{6})/', url).groups())
+    recent = json.loads(SUBMISSIONS.read_text())['filings']['recent']
+    i = recent['accessionNumber'].index(accession)
+    return dict(form=recent['form'][i], accession=accession, filing_date=recent['filingDate'][i])
+
+
+def filed(label, value, unit, low, high, tolerance, url, note):
+    """A filed figure set beside the model; it never changes a raw check."""
+    return dict(label=label, filed=value, unit=unit, model_low=low, model_high=high,
+                consistent=low - tolerance <= value <= high + tolerance, source_url=url, **filing(url), note=note)
+
+
+def stre_evidence(bridge, ledgers):
+    q1 = (RAW / 'edgar/10q-20260331.htm').read_bytes()
+    record = bridge['components'][0]['inputs']['record_shares']
+    out = [filed('STRE shares issued at 2026-03-31', F.tenq_shares_issued(q1)['STRE'], 'shares', record, record, 0,
+                 TENQ_Q1, 'Same count the June 10-Q reports; record-date balances are not filed')]
+    if bridge['id'] == 'stre-2026-03':
+        direct = D(F.tenq_quarter_dividends_paid(q1)['STRE']) * 1000
+        out.append(filed('STRE Q1 2026 cash dividends paid, three-month figure', direct, 'USD',
+                         bridge['total_low'], bridge['total_high'], D(500), TENQ_Q1,
+                         f"The June 10-Q's six-month less three-month figure is {display(bridge['reported'])} USD; "
+                         f"the two filings differ by {display(direct - bridge['reported'])} USD"))
+    return out
+
+
+def august_evidence(bridge, ledgers):
+    tenq = (RAW / 'edgar/10q-20260630.htm').read_bytes()
+    start, end, shares = F.tenq_subsequent_repurchases(tenq, 'STRC')
+    opening = F.tenq_shares_issued(tenq)['STRC']
+    inputs = bridge['components'][0]['inputs']
+    most = opening - shares
+    return [filed(f'STRC shares repurchased {start}..{end}', shares, 'shares',
+                  opening - inputs['end_dated_record_shares'], opening - inputs['start_dated_record_shares'], 0, TENQ,
+                  f"Leaves at most {most:,} shares entitled on {bridge['dates']['record_date']}, "
+                  f"worth {display(most * inputs['per_share_usd'])} USD, below the reported funding")]
+
+
+def october_evidence(bridge, ledgers):
+    as_of, shares = F.proxy_preferred_outstanding((RAW / 'edgar/def14a-20261005.htm').read_bytes())
+    modeled = [next(r.record_shares for r in led.tickers['STRC'].obligations if r.obligation.record_date == as_of)
+               for led in ledgers.values()]
+    return [filed(f'STRC shares outstanding at {as_of}', shares['STRC'], 'shares', min(modeled), max(modeled), 0,
+                  PROXY, 'Inside the modeled range, so the share roll-forward holds to mid-September')]
+
+
+EVIDENCE = {'stre-2026-03': stre_evidence, 'stre-2026-06': stre_evidence,
+            'strc-funding-2026-08-17': august_evidence, 'strc-funding-2026-10-19': october_evidence}
 
 
 def reconciliation_bridges(checks):
@@ -119,6 +184,9 @@ def reconciliation_bridges(checks):
         dates.update(funding_period_start=period.split('..')[0], funding_period_end=period.split('..')[1])
         out.append(finish_bridge(check, f'strc-funding-{check.as_of}', D(10)**6,
                                  components, dates, unknowns))
+    for bridge in out:
+        bridge['open_reason'] = OPEN_REASONS[bridge['id']]
+        bridge['filed_evidence'] = EVIDENCE.get(bridge['id'], lambda *_: [])(bridge, ledgers)
     return out
 
 
@@ -147,6 +215,11 @@ def render_report(bridges):
                   f"  Unknown residual: {display(b['residual_low'])} .. {display(b['residual_high'])} USD"]
         lines.extend(f'  {k}: {v}' for k, v in b['diagnostics'].items())
         lines.extend(f'  Unknown: {s}' for s in b['unknown_inputs'])
+        for e in b['filed_evidence']:
+            lines += [f"  Filed ({e['form']} {e['accession']}, {e['filing_date']}): {e['label']}: {display(e['filed'])} {e['unit']}",
+                      f"    Model: {display(e['model_low'])} .. {display(e['model_high'])} {e['unit']}; consistent: {e['consistent']}",
+                      f"    {e['note']}"]
+        lines.append(f"  Open: {b['open_reason']}")
         lines += [f"  Report source ({b['source_as_of']}): {b['source_url']}",
                   '  Settlement verified: False\n']
     return '\n'.join(lines) + '\n'
