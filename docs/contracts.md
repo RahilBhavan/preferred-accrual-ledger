@@ -30,3 +30,22 @@ The two lines above describe one CSV header. Dates use ISO format. `per_share` i
 `reconciliation.json` contains `checks,november_daily_rows,declared_vs_terms`. Each check carries `label,source_url,as_of,reported,ledger_low,ledger_high,unit,note,rounding_uncertainty,within,delta`. Decimal values are strings. `delta` is reported minus the nearest model bound, zero inside the model range; `within` additionally allows source rounding uncertainty. It is a numerical comparison, not a statement that a funding measure proves settlement. The five raw gaps must remain visible to downstream users. Reconciliation is a fixed historical diagnostic shared by both scenario outputs, not a function of the CLI projection horizon.
 
 Consumers should retain currencies, scenario and source links, tolerate additive fields and fail explicitly on unknown semantics. No data refresh or calibration is implied by rerunning the offline snapshot.
+
+## Reconciliation bridges
+
+`reconciliation.json` adds `bridges`; `reconciliation.txt` renders those same
+five unresolved historical comparisons. Existing `checks` semantics remain
+unchanged. Each stable `id` carries the raw outcome, reported measure, USD
+reported amount, rounding uncertainty, dated inputs and source URLs. Decimal
+amounts serialize as strings. Components have `kind` (`model` or `sensitivity`),
+`low`, `high`, `inputs` and `source_urls`.
+
+`total_low/high` sum component endpoints. Signed `residual_low/high` are
+`reported - total_high/low`, respectively; neither rounding nor sensitivity
+overlap absorbs an unexplained residual. `raw_delta` retains the original gap.
+`status=sensitivity_only` means assumed components were added, not agreement.
+`settlement_verified` is always false. STRE implied FX is diagnostic and is never
+substituted into calculation inputs. September coupons hold June principal
+constant and exclude unestablished conversions, special interest and cash timing.
+Unknown inputs are explicit. Bridges share the frozen historical scope across
+current/approved scenarios and do not depend on CLI projection dates.

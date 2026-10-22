@@ -9,7 +9,7 @@ python3 scripts/figure.py
 python3 -m compileall -q ledger scripts tests
 ```
 
-Observed: **36 tests passed**, **44 source bodies** matched the committed hash/size inventory, and **eight demo outputs** had identical hashes on consecutive runs. `validate.py` checks the exact required outputs, not unrelated local files. Exact hashes and commands are in [validation.json](validation.json).
+Observed: **43 tests passed**, **44 source bodies** matched the committed hash/size inventory, and **ten demo outputs** had identical hashes on consecutive runs. `validate.py` checks the exact required outputs, not unrelated local files. Exact hashes and commands are in [validation.json](validation.json).
 
 Both current and approved scenarios reproduce. Current produces 37 events and 30 schedule rows through March 2027; approved produces 72 events and 438 rows. Both retain the same historical reconciliation: 11 of 16 numerical comparisons within source rounding tolerance, with five gaps documented in [audit](audit.md). All 30 conditional November amount/date rows match; this does not establish approval of daily terms.
 
@@ -20,3 +20,12 @@ Behavioral coverage includes record-date entitlement after issuance (including z
 The generated [summary SVG](reconciliation.svg) was inspected at 900 px; the [responsive table](result.html) at 728 and 390 px through T3's HTML preview, with no console errors. It uses Rahil's light figure colors and IBM Plex Sans with system fallback; fonts are not bundled. The wide README image is a summary; the responsive table and text audit carry the exact readable figures on narrow screens. No external website was deployed. No human reader study or cross-platform typography certification is claimed.
 
 Reproducibility checks compare reruns on the tested interpreter and clean clone; they do not promise byte identity on every future Python version. A passing suite does not resolve legal/payment-model limitations. Hooks enforce the 20,000-byte staged-file limit and were not bypassed. No license was selected.
+
+## Reconciliation bridge improvement (2026-10-22)
+
+Seven added behavioral tests verify all five dated bridges, EUR/FX diagnostics,
+conservation at both range endpoints, signed residuals, source-table failures,
+September coupon sensitivity and actual CLI reports. The source snapshot and
+11/16 aggregate outcomes stay unchanged. Ten output files reproduce on consecutive
+runs; the SVG and HTML are unchanged. The earlier clean-clone receipt above
+records the previous eight-output version.

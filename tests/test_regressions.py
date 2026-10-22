@@ -16,17 +16,17 @@ Date = dt.date.fromisoformat
 
 
 class ReplayRegressionTests(unittest.TestCase):
-    def test_validation_hashes_only_its_eight_required_outputs(self):
+    def test_validation_hashes_only_its_ten_required_outputs(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             for scenario in ('current', 'approved'):
                 out = root / 'results' / scenario
                 out.mkdir(parents=True)
-                for name in ('events.jsonl', 'schedule.csv', 'summary.json', 'reconciliation.json'):
+                for name in ('events.jsonl', 'schedule.csv', 'summary.json', 'reconciliation.json', 'reconciliation.txt'):
                     (out / name).write_text('fixture')
             (root / 'results/unrelated.txt').write_text('unrelated')
             with patch.object(validate, 'ROOT', root):
-                self.assertEqual(len(validate.hashes()), 8)
+                self.assertEqual(len(validate.hashes()), 10)
                 (out / 'schedule.csv').unlink()
                 with self.assertRaises(FileNotFoundError):
                     validate.hashes()

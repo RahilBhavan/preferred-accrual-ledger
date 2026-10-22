@@ -201,8 +201,12 @@ def run(write_to=None) -> list[Check]:
     rows, nov = november_daily_table()
     checks = [nov] + tenq_quarter_checks() + weekly_funding_checks()
     if write_to is not None:
+        from .bridges import reconciliation_bridges, render_report
+        bridges = reconciliation_bridges(checks)
         write_to.mkdir(parents=True, exist_ok=True)
         (write_to / "reconciliation.json").write_text(json.dumps(
             {"checks": [c.row() for c in checks], "november_daily_rows": rows,
-             "declared_vs_terms": [c.row() for c in declared_vs_terms()]}, indent=1) + "\n")
+             "declared_vs_terms": [c.row() for c in declared_vs_terms()],
+             "bridges": bridges}, indent=1, default=str) + "\n")
+        (write_to / "reconciliation.txt").write_text(render_report(bridges))
     return checks

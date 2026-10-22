@@ -37,7 +37,7 @@ These are comparisons under stated assumptions, not certification of payment acc
 
 **October STRC:** September 30 entitlement is modeled at 90,594,215 shares × $0.50. The [October 19 8-K](https://www.sec.gov/Archives/edgar/data/1050446/000119312526424688/mstr-20261019.htm) gives $45.5m aggregate preferred funding. Its $202,892.50 residual is unresolved; funding and modeled dividends are different measures.
 
-**September interest sensitivity:** The [September 21 filing](https://www.sec.gov/Archives/edgar/data/1050446/000119312526396093/mstr-20260914.htm) explicitly combines dividends and debt interest. The June 10-Q's Note 8 reports principal balances of $1,010m (2028), $800m (2030A), and $603.659m (2031), rates of 0.625%, 0.625%, and 0.875%, and March/September 15 coupon dates. Holding those balances constant gives a hypothetical semiannual coupon:
+**September interest sensitivity:** The [September 21 filing](https://www.sec.gov/Archives/edgar/data/1050446/000119312526396093/mstr-20260914.htm) explicitly combines dividends and debt interest. The June 10-Q's Note 6 reports principal balances of $1,010m (2028), $800m (2030A), and $603.659m (2031), rates of 0.625%, 0.625%, and 0.875%, and March/September 15 coupon dates. Holding those balances constant gives a hypothetical semiannual coupon:
 
 ```text
 1,010,000,000 × 0.00625 / 2 = 3,156,250
@@ -54,3 +54,7 @@ That sensitivity overlaps $57.4m at its $0.05m rounding tolerance. It is a plaus
 The sweep covered correctness, error handling, security, accessibility (CLI/docs only), performance, dead code and project conventions. No measured performance defect or exploitable security defect survived the review. This is not a security certification. One T3 read-only review independently reproduced the late-declaration defect and the five gaps; the parent implemented and verified fixes.
 
 Arrears are approximate open-period scenarios, not legal-accounting calculations. STRD forfeiture means undeclared amounts do not accumulate in this model; declared unpaid amounts remain separate. The frozen corpus is not a point-in-time information backtest: `as_of` controls assumed future payment, not availability of all filings/rates. JSONL supports serial writers and validates retry/restart; it has no concurrent-writer lock, transactional durability or automatic recovery of partial writes.
+
+The standard demo now emits these five explanations as dated, source-linked
+bridges in `reconciliation.json` and a readable `reconciliation.txt`; see the
+[consumer contract](contracts.md#reconciliation-bridges). Raw checks are preserved.

@@ -33,7 +33,20 @@ python3 scripts/validate.py
 python3 scripts/figure.py
 ```
 
-Observed: **36 tests passed**. Current terms produce 37 events and 30 schedule rows; the approved scenario produces 72 events and 438 rows through March 2027. Both produce `schedule.csv`, `events.jsonl`, `summary.json` and `reconciliation.json`. No credentials or dependency install are needed. `validate.py` verifies source hashes, runs tests and repeats both demos, comparing eight output hashes. `figure.py` rebuilds the figure and a responsive local result table; it does not host a website.
+Observed: **43 tests passed**. Current terms produce 37 events and 30 schedule rows; the approved scenario produces 72 events and 438 rows through March 2027. Both produce `schedule.csv`, `events.jsonl`, `summary.json`, `reconciliation.json` and `reconciliation.txt`. No credentials or dependency install are needed. `validate.py` verifies source hashes, runs tests and repeats both demos, comparing ten output hashes. `figure.py` rebuilds the figure and a responsive local result table; it does not host a website.
+
+## Trace a gap in five minutes
+
+Run `python3 scripts/snapshot.py && python3 -m ledger`, then open
+`results/current/reconciliation.txt`. Search for `strc-funding-2026-09-21`:
+the reported $57.4m funding is separated into modeled STRC dividends, three
+regular-coupon sensitivities totaling $8,297,258.125, and an unknown residual
+of $20,490.375–$925,932.875. The coupon sensitivity holds June principal constant;
+it does not establish actual September payments. The raw check still fails.
+
+The same five bridges are in `reconciliation.json` under `bridges`, with USD
+amounts, source links, dated inputs, rounding uncertainty and unknowns. See
+[the bridge contract](docs/contracts.md#reconciliation-bridges).
 
 ## Repository layout
 

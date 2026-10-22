@@ -19,12 +19,14 @@
   ],
   "reproducible_output_files": {
     "results/approved/events.jsonl": "800b0ad0b106b9a27b8aa022f41b151894d01a6ad29de9f2c82a8171933da57b",
-    "results/approved/reconciliation.json": "e74d2819b781caae5205c958cd92029cef7a22e682f041103c2616c159700adf",
+    "results/approved/reconciliation.json": "e5f8d5c88690f01c82c92c02ec0fd2acb908bec9a51eb42eb6f0c1fc44b68629",
     "results/approved/schedule.csv": "a545becdf4e29518abd53824096cce08fddbebbc5d0d1c659db99c40f816fdde",
     "results/approved/summary.json": "e7e40fa1d9c97172db5dc06efdfdf58f6b5cd55220427f78d170ca272c5942b0",
+    "results/approved/reconciliation.txt": "561409778e6bef6c72338c28eecfe8359234904adb6da0b9a0a07c16a2a4af6b",
     "results/current/events.jsonl": "a571701bcaacedf9aee16f8fd3064ca01e7244694bfdc9dce1b3a2388dccd691",
-    "results/current/reconciliation.json": "e74d2819b781caae5205c958cd92029cef7a22e682f041103c2616c159700adf",
+    "results/current/reconciliation.json": "e5f8d5c88690f01c82c92c02ec0fd2acb908bec9a51eb42eb6f0c1fc44b68629",
     "results/current/schedule.csv": "699c6d404b5104b35acb3187b0ee6aab21c3d69350c35d95f5e615fe96a56703",
-    "results/current/summary.json": "d3e5a214197a794f7a3cf7e95201a3052d2af5758d26a5409edc3a3bb49f775b"
+    "results/current/summary.json": "d3e5a214197a794f7a3cf7e95201a3052d2af5758d26a5409edc3a3bb49f775b",
+    "results/current/reconciliation.txt": "561409778e6bef6c72338c28eecfe8359234904adb6da0b9a0a07c16a2a4af6b"
   }
 }

@@ -16,7 +16,7 @@ def run(args):
 def hashes():
     paths = [ROOT / 'results' / scenario / name
              for scenario in ('approved', 'current')
-             for name in ('events.jsonl', 'reconciliation.json', 'schedule.csv', 'summary.json')]
+             for name in ('events.jsonl', 'reconciliation.json', 'schedule.csv', 'summary.json', 'reconciliation.txt')]
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 
 

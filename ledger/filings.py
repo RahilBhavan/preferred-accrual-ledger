@@ -199,3 +199,39 @@ def ecb_rates(raw) -> dict[dt.date, Decimal]:
     s = raw.decode() if isinstance(raw, bytes) else raw
     return {dt.date.fromisoformat(r["TIME_PERIOD"]): Decimal(r["OBS_VALUE"])
             for r in csv.DictReader(io.StringIO(s)) if r["OBS_VALUE"]}
+
+
+@dataclass(frozen=True)
+class DebtTerms:
+    name: str
+    principal_usd: Decimal
+    annual_rate: Decimal
+    coupon_month_days: tuple[tuple[int, int], ...]
+
+
+def tenq_debt_terms(raw) -> list[DebtTerms]:
+    """Frozen June 2026 Note 6 tables: closing principal and regular coupon terms.
+
+    Reject incomplete table evidence rather than silently omitting an interest component.
+    Principal at inception, carrying value and effective rates are deliberately excluded.
+    """
+    text = to_text(raw)
+    names = ('2028', '2029', '2030A', '2030B', '2031', '2032')
+    rate_row = re.search(r'Stated Interest Rate \(2\) (.*?) Interest Payment Dates', text)
+    date_row = re.search(r'Interest Payment Dates \(3\) (.*?) Net Proceeds', text)
+    balance = re.search(r'June 30, 2026 Outstanding Principal Amount (.*?) Total \$', text)
+    if not all((rate_row, date_row, balance)):
+        raise ValueError('missing June 2026 debt table evidence')
+    rates = re.findall(r'([\d.]+)\s*%', rate_row.group(1))
+    dates = re.findall(r'([A-Z][a-z]+ \d{1,2})\s*&\s*([A-Z][a-z]+ \d{1,2})', date_row.group(1))
+    if len(rates) != len(names) or len(dates) != len(names):
+        raise ValueError('incomplete June 2026 debt rate/date columns')
+    out = []
+    for name, rate, pair in zip(names, rates, dates):
+        principal = re.search(rf'{name} Convertible Notes \$?\s*([\d,]+)', balance.group(1))
+        if principal is None:
+            raise ValueError(f'missing June 2026 principal for {name}')
+        days = tuple((d.month, d.day) for d in (parse_date(f'{s}, 2026') for s in pair))
+        out.append(DebtTerms(f'{name} Convertible Notes', Decimal(_number(principal.group(1))) * 1000,
+                             Decimal(rate) / 100, days))
+    return out
