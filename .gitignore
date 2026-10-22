@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+data/raw/
+data/curated/
+data/derived/
+results/
+figures/

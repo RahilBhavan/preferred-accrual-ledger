@@ -1,0 +1,11 @@
+# Reconciliation and provenance
+
+The frozen cache contains 44 source bodies with URLs, fetch dates and SHA-256 in `provenance/sources-*.csv`. The compressed snapshot preserves all cached documents and metadata in <=18,000-byte parts. The financial cutoff is October 21, 2026; UTC retrieval may fall on October 22 while still October 21 in Detroit.
+
+Primary financial inputs are the [June 2026 10-Q](https://www.sec.gov/Archives/edgar/data/1050446/000105044626000044/mstr-20260630.htm), weekly SEC 8-K tables through October 19, and the conditional November declaration. ECB observations are the currency conversion proxy. No EUR/USD aggregation is implicit in the daily ledger.
+
+The demo reports 11 of 16 aggregate reconciliation checks within stated rounding tolerance. Five remain outside it. They are visible in `results/current/reconciliation.json`: STRE Q1 and Q2 currency conversion differences, STRC August 17 and October 15 funding differences, and September funding that includes debt interest. ECB reference FX is not necessarily the company's actual settlement conversion. June closing shares are assumed for earlier quarterly checks. Q1 is the difference of two rounded cash totals and carries one unit of uncertainty; direct quarterly figures carry half a reported unit. Funding is not always settlement and can include unmodeled interest.
+
+Dating weekly buybacks at the week's start or end creates two share-count sensitivities. These are not guaranteed cash bounds: opening shares, declaration dates, cash timing and company rounding can also matter. Do not adjust source values to force agreement. The per-share check independently compares all 30 conditional November rows and the formula's total of $1 per share, without inferring the proposal is enacted.
+
+Reproduction uses no credentials. `ledger.fetch` is an optional low-level network helper; there is no claimed complete automated refresh pipeline for this repo. The archived cache is the supported reproducible input. Generated JSONL can be reloaded through `load_jsonl`; `append_jsonl` skips identical retries and rejects conflicting IDs. Replay sorts events deterministically, and record-date shares fix entitlement even if issuance occurs later. The CLI's output files are regenerated artifacts, not an operational payment journal.
