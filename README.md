@@ -46,6 +46,8 @@ Observed: **36 tests passed**. Current terms produce 37 events and 30 schedule r
 
 ## Documentation
 
+- [Public design system](DESIGN.md): Rahil Design 3.3.0, shared tokens and visual review rules.
+
 - [Scope and acceptance](docs/spec.md): local v1 contract.
 - [Terms and limitations](docs/terms.md): schedules, scenarios and arrears boundary.
 - [Reconciliation](docs/reconciliation.md): unresolved mismatches and provenance.

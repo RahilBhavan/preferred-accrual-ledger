@@ -1,0 +1,18 @@
+{
+  "design_authority": "rahil-design",
+  "version": "3.3.0",
+  "tokens_sha256": "d68805efd223fc8c3deb715e9ef240ae633a740c69993959ccf3dd13c140c05b",
+  "scope": "Public project artifacts; existing CLI/protocol/calculation behavior retained.",
+  "surfaces": [
+    "docs/reconciliation.svg",
+    "docs/result.html"
+  ],
+  "changes": [
+    "Required skill routing in AGENTS.md",
+    "Portable DESIGN.md contract",
+    "Unchanged canonical token snapshot",
+    "README design link"
+  ],
+  "review": "Existing figure source palettes/type declarations checked against the canonical roles. Seven unchanged published figures loaded in the collaborative browser at desktop width; prior figure briefs/verification retain exact rendering and narrow-width limits. No numerical values or geometry changed.",
+  "font_limit": "Static SVG image viewers may fall back when IBM Plex Sans is not installed; the ledger tracker embeds fonts."
+}
