@@ -15,4 +15,11 @@ Financial snapshot: **2026-10-21**. Publication continuation preserves the origi
 
 ## Remote verification
 
-Pending initial publication and GitHub CI. This receipt will be completed with the verified commit, fresh-clone outcome and CI URL.
+- Public repository created under authenticated `RahilBhavan`; default branch is `main`.
+- Reviewed implementation commit: [`7c14621001c832de625078cb55e90cf79a4609b6`](https://github.com/RahilBhavan/preferred-accrual-ledger/commit/7c14621001c832de625078cb55e90cf79a4609b6), containing the original `df21cf6` ancestor and correctness commit `f5abd70`.
+- [GitHub Actions run 39718963656](https://github.com/RahilBhavan/preferred-accrual-ledger/actions/runs/39718963656) passed on Python 3.14.0 / Ubuntu 24.04 at 2026-10-22 03:50 UTC. Publication/check time is separate from the frozen financial cutoff.
+- A new HTTPS clone from GitHub restored the snapshot and ran every README command: source verification, 36 tests, both scenarios, `validate.py`, `figure.py` and `compileall`. Eight output hashes matched the working copy and `git diff --exit-code` passed after generation.
+- Remote `main` SHA was checked against the reviewed local commit. The receipt follow-up changes only this evidence and the verified CI badge; execution source and frozen inputs are unchanged. The final receipt commit is visible in repository history and is checked again before goal completion.
+- No PR, deployment, account transaction, schedule or outbound message was created. Repository About/topics describe the actual offline research tool.
+
+The publication goal is completed only after the final remote commit, clean-clone commands and CI are confirmed. The persistent goal status is maintained in the T3 project chat; five source discrepancies remain explicitly unresolved.

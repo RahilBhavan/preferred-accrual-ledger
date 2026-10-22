@@ -1,5 +1,7 @@
 # Preferred accrual ledger: replay five sourced preferred dividend schedules
 
+[![Offline ledger checks](https://github.com/RahilBhavan/preferred-accrual-ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/RahilBhavan/preferred-accrual-ledger/actions/workflows/ci.yml)
+
 ![11 of 16 checks are within rounding tolerance: quarterly cash totals 6/8, weekly funding 4/7, conditional daily total 1/1. Five gaps remain; funding is not settlement.](docs/reconciliation.svg)
 
 An offline event-replay tool for Strategy's STRF, STRC, STRE, STRK and STRD dividend schedules, entitlements and unpaid scenarios. It preserves USD/EUR currencies and sources, fixes entitlement at record dates, and separates cumulative arrears from noncumulative STRD. Financial cutoff: **October 21, 2026**. The [review](docs/audit.md) explains five unresolved aggregate differences without fitting source values.
