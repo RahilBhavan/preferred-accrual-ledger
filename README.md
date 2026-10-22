@@ -85,6 +85,6 @@ The snapshot preserves 44 attributed source bodies: primary SEC filings/declarat
 
 ## License
 
-No license file yet. Third-party filings/data retain their owners' rights.
+[MIT](LICENSE). The license covers this project's code only. Third-party filings/data retain their owners' rights.
 
 Part of [Rahil Bhavan's projects](https://github.com/RahilBhavan).

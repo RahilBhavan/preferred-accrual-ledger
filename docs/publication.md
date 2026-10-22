@@ -23,3 +23,7 @@ Financial snapshot: **2026-10-21**. Publication continuation preserves the origi
 - No PR, deployment, account transaction, schedule or outbound message was created. Repository About/topics describe the actual offline research tool.
 
 The publication goal is completed only after the final remote commit, clean-clone commands and CI are confirmed. The persistent goal status is maintained in the T3 project chat; five source discrepancies remain explicitly unresolved.
+
+## Update 2026-10-22: license
+
+The MIT license was added in `LICENSE`. It covers this project's code only. Earlier statements in this record that no license file existed describe the state at publication.
