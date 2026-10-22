@@ -194,6 +194,9 @@ def replay(events, start: dt.date, end: dt.date, as_of: dt.date | None = None,
 def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> TickerLedger:
     warnings: list[str] = []
     of = lambda kind: [e for e in events if e.kind == kind]
+    openings = of("opening_balance")
+    if len(openings) != 1 or openings[0].date != start:
+        raise ValueError(f"{ins.ticker}: exactly one opening balance dated at replay start is required")
     regimes = [(dt.date.min, ins.base_regime)] + sorted((e.date, e.regime) for e in of("regime_change"))
     rate_on = _rate_lookup(ins, of("rate_reset"))
     schedule = [o for o in build_schedule(ins, regimes, rate_on, start, end) if o.record_date >= start]
@@ -220,11 +223,20 @@ def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> T
             warnings.append(f"{ins.ticker} skip {e.id}: no obligation with record date {e.record_date}")
 
     pay_on = defaultdict(list)
+    declared_on = defaultdict(list)
     starts = defaultdict(list)
     for rec in records.values():
         decl = rec.declaration
         declared_other = decl and decl.pay_date and decl.pay_date != rec.obligation.nominal_pay_date
         rec.pay_date = decl.pay_date if declared_other else rec.obligation.pay_date
+        if decl is not None:
+            if decl.date > rec.pay_date:
+                raise ValueError(f"{ins.ticker} {decl.id}: declaration date follows payment date; "
+                                 "late declarations are outside v1")
+            declared_on[decl.date].append(rec)
+        if rec.payment is not None and rec.payment.date != rec.pay_date:
+            raise ValueError(f"{ins.ticker} {rec.payment.id}: payment date must equal {rec.pay_date}; "
+                             "early/late settlement is outside v1")
         pay_on[rec.pay_date].append(rec)
         starts[max(rec.obligation.window_start, start)].append(rec)
     open_recs: list[ObligationRecord] = []
@@ -254,7 +266,7 @@ def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> T
         if rec is not None:
             if shares is None:
                 raise ValueError(f"{ins.ticker}: record date {day} before an opening balance")
-            if rec.declaration is not None:
+            if rec.declaration is not None and rec.declaration.date <= day:
                 rec.per_share, rec.basis = rec.declaration.per_share, "declared"
             else:
                 rec.per_share = rec.obligation.per_share
@@ -262,6 +274,11 @@ def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> T
             rec.record_shares = shares
             rec.amount = rec.per_share * shares
             rec.status = "fixed"
+
+        for rec in declared_on.get(day, []):
+            if rec.record_shares is not None:
+                rec.per_share, rec.basis = rec.declaration.per_share, "declared"
+                rec.amount = rec.per_share * rec.record_shares
 
         if is_compounding_date(ins, day):
             for t in tranches:
@@ -321,7 +338,8 @@ def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> T
         open_recs = [r for r in open_recs + starts.get(day, []) if day < r.pay_date]
         for r in open_recs:
             per_share = r.per_share if r.record_shares is not None else r.obligation.per_share
-            accrued += _accrued_fraction(r.obligation, day) * per_share * (r.record_shares or shares or 0)
+            entitlement_shares = r.record_shares if r.record_shares is not None else (shares or 0)
+            accrued += _accrued_fraction(r.obligation, day) * per_share * entitlement_shares
             if r.basis == "declared" and r.record_shares is not None:
                 declared_unpaid += r.amount
         arrears = sum((t.value(ins, rate, day) for t in tranches), ZERO)

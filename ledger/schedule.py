@@ -141,8 +141,11 @@ def build_schedule(instrument, regimes, rate_on, start: dt.date, end: dt.date) -
         hi = min(end, nxt - ONE_DAY)
         if lo > hi:
             continue
+        # Daily windows are single record dates; no surrounding payment-window margin is needed.
+        # Generating that margin demanded rates before the daily regime even took effect.
+        pad = dt.timedelta(0) if regime == "daily" else margin
         candidates = GENERATORS[regime](instrument.ticker, instrument.stated_amount, lenient,
-                                        instrument.calendar, lo - margin, hi + margin)
+                                        instrument.calendar, lo - pad, hi + pad)
         out.extend(o for o in candidates
                    if o.window_start >= effective and o.window_end < nxt
                    and o.window_end >= start and o.window_start <= end)

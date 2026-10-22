@@ -113,10 +113,13 @@ class EventLog:
 
 def load_jsonl(path: pathlib.Path) -> list[Event]:
     out = []
+    log = EventLog()
     for n, line in enumerate(path.read_text().splitlines(), 1):
         if line.strip():
             try:
-                out.append(Event.from_dict(json.loads(line)))
+                event = Event.from_dict(json.loads(line))
+                log.add(event)
+                out.append(event)
             except (ValueError, TypeError) as exc:
                 raise ValueError(f"{path}:{n}: {exc}") from exc
     return out
@@ -139,6 +142,12 @@ def append_jsonl(path: pathlib.Path, events) -> tuple[int, int]:
         added += 1
     if lines:
         path.parent.mkdir(parents=True, exist_ok=True)
+        separator = ""
+        if path.exists() and path.stat().st_size:
+            with path.open("rb") as fh:
+                fh.seek(-1, 2)
+                if fh.read(1) != b"\n":
+                    separator = "\n"
         with path.open("a") as fh:
-            fh.write("\n".join(lines) + "\n")
+            fh.write(separator + "\n".join(lines) + "\n")
     return added, skipped

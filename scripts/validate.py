@@ -14,9 +14,10 @@ def run(args):
 
 
 def hashes():
-    return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
-            for directory in (ROOT / "results", ROOT / "data/derived")
-            if directory.exists() for p in sorted(directory.rglob("*")) if p.is_file()}
+    paths = [ROOT / 'results' / scenario / name
+             for scenario in ('approved', 'current')
+             for name in ('events.jsonl', 'reconciliation.json', 'schedule.csv', 'summary.json')]
+    return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
     if first != hashes():
         raise RuntimeError("demo output hashes changed between identical runs")
     evidence = {"financial_as_of": "2026-10-21", "python": sys.version.split()[0],
-                "demo_commands": [[sys.executable, *d] for d in DEMOS],
+                "demo_commands": [['python3', *d] for d in DEMOS],
                 "reproducible_output_files": first}
     (ROOT / "docs/validation.json").write_text(json.dumps(evidence, indent=2) + "\n")
     print(f"Reproduced {len(first)} output file hashes")

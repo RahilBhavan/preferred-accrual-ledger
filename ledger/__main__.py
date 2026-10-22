@@ -10,6 +10,10 @@ from .engine import replay
 from .seed import LEDGER_START, build_events, write_jsonl
 from .reconcile import run as reconcile
 
+SCHEDULE_FIELDS = ('ticker', 'currency', 'record_date', 'payment_date', 'regime', 'per_share',
+                   'declared_per_share', 'record_shares', 'amount', 'model_settlement',
+                   'status', 'basis', 'source')
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -35,7 +39,7 @@ def main():
                          model_settlement=str(rec.paid), status=rec.status, basis=rec.basis,
                          source=rec.declaration.source_url if rec.declaration else ';'.join(led.tickers[ticker].instrument.sources)))
     with (args.out / 'schedule.csv').open('w', newline='') as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w = csv.DictWriter(f, fieldnames=SCHEDULE_FIELDS)
         w.writeheader()
         w.writerows(rows)
     summary = {'as_of': '2026-10-21', 'scenario': args.scenario,
