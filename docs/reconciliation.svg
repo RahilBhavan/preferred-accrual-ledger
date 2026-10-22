@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="530" viewBox="0 0 900 530" role="img" aria-labelledby="title desc">
+<title id="title">11 of 16 checks within rounding tolerance</title>
+<desc id="desc">Quarterly cash totals: 6 of 8; weekly funding: 4 of 7; conditional daily total: 1 of 1. Five differences remain unresolved. Funding is not settlement. Financial cutoff October 21, 2026.</desc>
+<rect width="900" height="530" fill="#F5F5EF"/>
+<g fill="#111214" font-family="IBM Plex Sans, sans-serif">
+<text x="36" y="53" font-size="23">RAHIL BHAVAN · PREFERRED ACCRUAL LEDGER</text>
+<text x="36" y="112" font-size="42">11 of 16 checks within rounding</text>
+<text x="36" y="159" font-size="29">Five gaps remain: two FX and three funding comparisons.</text>
+<text x="36" y="235" font-size="31">Quarterly cash totals</text>
+<text x="840" y="235" text-anchor="end" font-size="34">6 / 8</text>
+<text x="36" y="301" font-size="31">Weekly funding comparisons</text>
+<text x="840" y="301" text-anchor="end" font-size="34">4 / 7</text>
+<text x="36" y="367" font-size="31">Conditional daily-table total</text>
+<text x="840" y="367" text-anchor="end" font-size="34">1 / 1</text>
+<text x="36" y="423" font-size="25">Funding comparisons do not establish settlement.</text>
+<text x="36" y="466" font-size="21" fill="#52545A">As of 2026-10-21 · SEC filings + ECB FX · ledger/reconcile.py</text>
+<text x="36" y="499" font-size="21" fill="#52545A">Daily terms are conditional; the October 28 vote is pending at cutoff.</text>
+</g></svg>

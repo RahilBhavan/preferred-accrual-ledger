@@ -1,0 +1,62 @@
+{
+  "id": "ledger-reconciliation",
+  "set": "preferred-ledger",
+  "template": "rahil-light-figure",
+  "reader": "Engineer or recruiter reviewing the repository",
+  "decision": "Treat aggregate reconciliation as incomplete and inspect the five gaps",
+  "point": "11 of 16 checks are within source rounding tolerance; five gaps remain",
+  "comparison": "Terms-derived model amounts compared with filed amounts under stated assumptions",
+  "title": "11 of 16 checks within rounding",
+  "subtitle": "Five gaps remain: two FX and three funding comparisons.",
+  "caption": "Funding comparisons do not establish settlement.",
+  "form": "table",
+  "values_count": 8,
+  "shape_reason": "Counts and denominators are a small lookup table, with no area or length encoding",
+  "encodings": [],
+  "accents": 1,
+  "accent_meaning": "title-value",
+  "estimates": {
+    "present": true,
+    "labeled": true,
+    "treatment": "range"
+  },
+  "illustration": false,
+  "illustration_labeled": false,
+  "compare_with": [],
+  "scale_id": "counts",
+  "sources": [
+    {
+      "title": "June 10-Q",
+      "url": "https://www.sec.gov/Archives/edgar/data/1050446/000105044626000044/mstr-20260630.htm",
+      "as_of": "2026-06-30"
+    },
+    {
+      "title": "Frozen financial corpus",
+      "url": "https://github.com/RahilBhavan/preferred-accrual-ledger/tree/main/provenance",
+      "as_of": "2026-10-21"
+    }
+  ],
+  "alt": "11 of 16 checks within rounding: quarter totals 6/8, funding 4/7, conditional daily total 1/1. Five gaps remain; funding is not settlement.",
+  "sizes_checked": [
+    "900x530"
+  ],
+  "feed_width_viewed": true,
+  "min_label_px": 21,
+  "point_px": 42,
+  "contrast_min": 6.92,
+  "measured_by": "T3 html_preview; CSS font sizes and WCAG relative luminance calculation",
+  "five_second_test": {
+    "by": "agent",
+    "date": "2026-10-21",
+    "said": "11/16 overlaps, five unresolved differences; funding is a different measure",
+    "result": "pass"
+  },
+  "attached_in": {
+    "post": "README.md",
+    "image": "docs/reconciliation.svg"
+  },
+  "verdict_allow": [],
+  "warn_reasons": {
+    "five-second test was an agent self-test; a real reader is better": "No human reader study was available; no user-study claim is made."
+  }
+}

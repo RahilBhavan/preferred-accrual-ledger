@@ -3,12 +3,12 @@
   "python": "3.14.7",
   "demo_commands": [
     [
-      "/usr/bin/python",
+      "python3",
       "-m",
       "ledger"
     ],
     [
-      "/usr/bin/python",
+      "python3",
       "-m",
       "ledger",
       "--scenario",

@@ -1,15 +1,22 @@
-# Local validation evidence
+# Validation evidence
 
-Validated the continuation on Python 3.14.7, financial cutoff 2026-10-21. No external account writes.
+Financial cutoff: 2026-10-21. Local runtime: Python 3.14.7, standard library only. CI pins Python 3.14.0 on Ubuntu 24.04, with full-SHA action references and read-only contents permission. It has no schedule, secrets or paid-service dependency. Python syntax is checked with `compileall`; there is no static typechecker configured.
 
 ```bash
+python3 scripts/snapshot.py
 python3 scripts/validate.py
+python3 scripts/figure.py
+python3 -m compileall -q ledger scripts tests
 ```
 
-This runs the source verifier, unittest suite and each README demo twice. Observed: 23 tests passed; 44 source bodies matched the committed SHA-256 inventory; 8 generated files had identical hashes on consecutive runs. Exact output hashes and invoked demo commands are in [validation.json](validation.json). Floating-point model outputs are tied to the documented Python/NumPy environment, not a cross-platform byte-identity guarantee.
+Observed: **36 tests passed**, **44 source bodies** matched the committed hash/size inventory, and **eight demo outputs** had identical hashes on consecutive runs. `validate.py` checks the exact required outputs, not unrelated local files. Exact hashes and commands are in [validation.json](validation.json).
 
-Cold-restore check: copied only the files eligible for the local commit into a new directory under `~/scratch/preferred-accrual-ledger/cold-check`, with no raw cache, generated results or installed repo environment. Restored `snapshot/` offline, ran all tests/demos and compared generated hashes with the working repo. The hashes matched. The earnings check used the documented pinned dependency environment under `~/scratch/strategy-fair-value-earnings/venv`. Scratch copies were removed after validation.
+Both current and approved scenarios reproduce. Current produces 37 events and 30 schedule rows through March 2027; approved produces 72 events and 438 rows. Both retain the same historical reconciliation: 11 of 16 numerical comparisons within source rounding tolerance, with five gaps documented in [audit](audit.md). All 30 conditional November amount/date rows match; this does not establish approval of daily terms.
 
-Real-source behavior, negative inputs and domain invariants are exercised in `tests/`. A passing suite does not resolve the financial/model limitations in the README. Relative documentation links, whitespace and staged-file sizes were checked before committing. The local pre-commit hook checks index sizes and rejects any staged file above 20,000 bytes (5,000 estimated tokens); it was enabled and not bypassed.
+A scratch copy under `~/scratch/preferred-accrual-ledger/` contained only publication-eligible files, with no restored cache, generated results or local environment. It restored the committed archive offline and passed the commands above. All eight output hashes matched the working copy. A remote fresh-clone check and CI run are recorded in [publication.md](publication.md).
 
-No charts or existing partial figures are part of the validated deliverable. No license was selected. Generated outputs remain available locally and are recreated by the README commands.
+Behavioral coverage includes record-date entitlement after issuance (including zero shares), cumulative arrears versus undeclared STRD forfeiture, declared-but-unpaid STRD, oldest-arrears-first allocation, regular compounding, step-up caps, deterministic replay, serial JSONL append/retry/reload, corrupt/truncated-store rejection, unique start-date balances, declaration chronology, unsupported payment dates, daily paid/missed scenarios, malformed input, empty CLI output and 2026–27 calendar boundaries. Regression tests failed before the fixes described in the audit.
+
+The generated [summary SVG](reconciliation.svg) was inspected at 900 px; the [responsive table](result.html) at 728 and 390 px through T3's HTML preview, with no console errors. It uses Rahil's light figure colors and IBM Plex Sans with system fallback; fonts are not bundled. The wide README image is a summary; the responsive table and text audit carry the exact readable figures on narrow screens. No external website was deployed. No human reader study or cross-platform typography certification is claimed.
+
+Reproducibility checks compare reruns on the tested interpreter and clean clone; they do not promise byte identity on every future Python version. A passing suite does not resolve legal/payment-model limitations. Hooks enforce the 20,000-byte staged-file limit and were not bypassed. No license was selected.
