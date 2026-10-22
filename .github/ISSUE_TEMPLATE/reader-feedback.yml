@@ -1,0 +1,36 @@
+name: Reader feedback
+description: Tell me where this project was unclear, wrong or hard to run.
+title: "Feedback: "
+labels: ["feedback"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to find out or do?
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Did you get a useful answer?
+      options:
+        - "Yes"
+        - "Partly"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: stuck
+    attributes:
+      label: Where did you get stuck or stop trusting the result?
+      description: Paste the command and output, or quote the README line.
+  - type: textarea
+    id: wrong
+    attributes:
+      label: Anything factually wrong?
+      description: A number, a filing reading or a financial or protocol assumption. Link the source if you can.
+  - type: input
+    id: background
+    attributes:
+      label: Your background (optional)
+      placeholder: "e.g. credit analyst, Bitcoin engineer, student"
