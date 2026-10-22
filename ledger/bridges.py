@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 from decimal import Decimal as D
 
 from . import filings as F
@@ -114,7 +115,7 @@ def reconciliation_bridges(checks):
             unknowns += ['September debt principal after conversions/repurchases',
                          'Actual cash coupon dates and additional/special interest']
         # The reported period is distinct from the mapped dividend payment date.
-        period = check.label.split(' funded ', 1)[1].split(', ', 1)[0]
+        period = re.search(r'(\d{4}-\d{2}-\d{2}\.\.\d{4}-\d{2}-\d{2})', check.label).group(1)
         dates.update(funding_period_start=period.split('..')[0], funding_period_end=period.split('..')[1])
         out.append(finish_bridge(check, f'strc-funding-{check.as_of}', D(10)**6,
                                  components, dates, unknowns))

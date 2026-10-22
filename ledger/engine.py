@@ -12,6 +12,7 @@ Day processing order (all at close of business):
 
 Days after `as_of` are a projection: an obligation with no declaration is assumed to be
 declared and paid at the amount the terms give, unless a skip event says otherwise.
+Without a payment event, a settled obligation has status "assumed_settled", never "paid".
 """
 from __future__ import annotations
 
@@ -95,7 +96,9 @@ def compounding_anchor(ins: Instrument, nominal_pay: dt.date) -> dt.date:
 @dataclass
 class ObligationRecord:
     obligation: Obligation
-    status: str = "scheduled"        # scheduled, fixed, paid, partial, missed, forfeited
+    status: str = "scheduled"        # scheduled, fixed, paid, assumed_settled, partial, missed,
+    #                                  declared_unpaid, forfeited. "paid" needs a payment event;
+    #                                  "assumed_settled" is the model's settlement assumption.
     basis: str = ""                  # declared, projected, terms
     per_share: Decimal = ZERO        # amount used (declared amount if declared)
     record_shares: int | None = None
@@ -321,7 +324,7 @@ def _replay_ticker(ins: Instrument, events: list[Event], start, end, as_of) -> T
             if shortfall > 0 and rec.obligation.regime == "daily":
                 raise ValueError("daily-regime arrears are outside v1; daily scenario supports paid schedules only")
             if shortfall <= 0:
-                rec.status = "paid"
+                rec.status = "paid" if rec.payment is not None else "assumed_settled"
             elif ins.cumulative:
                 rec.status = "partial" if applied_current > 0 else "missed"
                 anchor = compounding_anchor(ins, rec.obligation.nominal_pay_date)

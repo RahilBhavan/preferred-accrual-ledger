@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from dataclasses import asdict, dataclass
 from decimal import Decimal
 
@@ -151,6 +152,13 @@ FUNDING_MAP = [
 ]
 
 
+def funded_purpose(sentence: str) -> str:
+    """What the 8-K says the amount funded, in its own words (e.g. preferred dividends and debt interest)."""
+    purpose = re.search(r"to fund (?:the payment of )?(.+)$", sentence).group(1)
+    purpose = re.split(r",? (?:and )?\$\d", purpose)[0].strip(" ,")   # drop the next clause's amount
+    return re.sub(r"\b(?:Strategy's|its) ", "", purpose)
+
+
 def weekly_funding_checks() -> list[Check]:
     end = dt.date(2026, 10, 21)
     ledgers = {d: replay(build_events("approved", d), LEDGER_START, end, as_of=end) for d in ("start", "end")}
@@ -173,7 +181,8 @@ def weekly_funding_checks() -> list[Check]:
                     amount = amount * (lo if dating == "start" else hi)
                 total += amount
             totals[dating] = total / 10**6
-        label = f"{', '.join(sorted({t for t, _ in targets}))} dividends funded {week.start}..{week.end}, USD millions"
+        label = (f"Funding of {funded_purpose(funding.sentence)} {week.start}..{week.end} "
+                 f"vs modeled {', '.join(sorted({t for t, _ in targets}))} dividends, USD millions")
         if any(t == "STRE" for t, _ in targets):
             note += "; range uses the week's lowest and highest ECB EUR/USD"
         out.append(Check(label, _meta(path)["url"], prefix, funding.amount_usd / 10**6,

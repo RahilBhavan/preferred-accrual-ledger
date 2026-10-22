@@ -34,8 +34,9 @@ def main():
     (ROOT / 'docs/reconciliation.svg').write_text('\n'.join(svg) + '\n')
     rows = []
     labels = ('STRE Q1 2026 cash dividends', 'STRE Q2 2026 cash dividends',
-              'STRC funding · Aug 10–16', 'STRC funding · Sep 14–20, includes interest',
-              'STRC funding · Oct 12–18')
+              'STRC dividend funding · Aug 10–16',
+              'Preferred dividend and debt interest funding · Sep 14–20 (STRC model)',
+              'Preferred dividend funding · Oct 12–18 (STRC model)')
     for c in checks:
         if c.within:
             continue

@@ -20,10 +20,15 @@ Replay requires one opening balance per included ticker at `start`; it does not 
 
 ```text
 ticker,currency,record_date,payment_date,regime,per_share,declared_per_share,
-record_shares,amount,model_settlement,status,basis,source
+record_shares,amount,model_settlement,status,basis,source,payment_form,
+share_change_since_prior_record,share_change_basis,share_change_sources
 ```
 
-The two lines above describe one CSV header. Dates use ISO format. `per_share` is terms-derived; `declared_per_share` is the amount used at record/declaration, which can also be projected/terms-derived. Read `basis` with it. Amounts use instrument currency, **not automatically USD**. `model_settlement` is an assumption unless an explicit supported payment event is supplied; the CLI seed supplies declarations, not a bank feed. Future schedule rows can extend beyond `--end` only by payment/accrual window; the CSV filters record dates after `--end`.
+The three lines above describe one CSV header. The last four columns were added on 2026-10-22; positional consumers of the first thirteen are unaffected. Dates use ISO format. `per_share` is terms-derived; `declared_per_share` is the amount used at record/declaration, which can also be projected/terms-derived. Read `basis` with it. Amounts use instrument currency, **not automatically USD**. `model_settlement` is an assumption unless an explicit supported payment event is supplied; the CLI seed supplies declarations, not a bank feed. Future schedule rows can extend beyond `--end` only by payment/accrual window; the CSV filters record dates after `--end`.
+
+`status` values: `assumed_settled` (the model assumes the declared or projected amount settled on the payment date; no payment evidence), `paid` (a supplied `payment` event covers the full amount), `partial`, `missed`, `declared_unpaid` (STRD), `forfeited` (undeclared STRD) and `fixed` (record date passed, payment date not reached in the replay range). Before 2026-10-22, `paid` also covered assumed settlements. `payment_form` is `cash` where the terms permit only cash or a cash declaration covers the row, `stock` or `cash_and_stock` from a declaration's `stock_fraction`, and `election_unknown` for undeclared STRK rows. `share_change_since_prior_record` is the net of attributed issuance and buyback events after the ticker's previous record date (or the June 30 opening balance) through this record date; `share_change_sources` lists the weekly 8-Ks that report them, and `share_change_basis` states the period-end dating assumption.
+
+`--from YYYY-MM-DD`, `--to YYYY-MM-DD` or `--next-days N` (N days after the 2026-10-21 cutoff) select rows by `payment_date`, inclusive. Stdout is then CSV with `ticker,currency,record_date,payment_date,record_shares,amount,status,basis,payment_form`, sorted by payment date; the run summary moves to stderr and the full output files are still written.
 
 `summary.json` identifies `as_of,scenario,status,opening_share_date,events,ending_state,warnings`. Warnings include conditional declarations inapplicable under the chosen regime. `as_of` controls projections and does not filter the full source corpus into a point-in-time information set.
 
@@ -35,7 +40,9 @@ Consumers should retain currencies, scenario and source links, tolerate additive
 
 `reconciliation.json` adds `bridges`; `reconciliation.txt` renders those same
 five unresolved historical comparisons. Existing `checks` semantics remain
-unchanged. Each stable `id` carries the raw outcome, reported measure, USD
+unchanged. Since 2026-10-22, weekly funding check labels quote what the 8-K says the
+amount funded (for example "dividends on preferred stock and interest on outstanding
+indebtedness") and name the modeled tickers separately. Each stable `id` carries the raw outcome, reported measure, USD
 reported amount, rounding uncertainty, dated inputs and source URLs. Decimal
 amounts serialize as strings. Components have `kind` (`model` or `sensitivity`),
 `low`, `high`, `inputs` and `source_urls`.
