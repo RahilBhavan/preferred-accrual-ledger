@@ -27,3 +27,5 @@ The publication goal is completed only after the final remote commit, clean-clon
 ## Update 2026-10-22: license
 
 The MIT license was added in `LICENSE`. It covers this project's code only. Earlier statements in this record that no license file existed describe the state at publication.
+
+Test and source counts in this receipt (36 tests, 44 source bodies, eight output hashes) are as of publication. The current counts are 55 tests, 45 source bodies and ten output hashes; see [validation.md](validation.md).
