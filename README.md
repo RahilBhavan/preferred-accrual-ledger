@@ -81,6 +81,7 @@ cross-checks (`filed_evidence`) and an `open_reason`. See
 - `provenance/`: source URL/date/hash inventories.
 - `tests/`: real-source checks and replay invariants.
 - `docs/`: scope, terms, reconciliation and validation.
+- `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `design/`, `.githooks/`: instructions, design tokens and a pre-commit size check for the coding agents that work in this repository. The code does not use them.
 
 ## Documentation
 
