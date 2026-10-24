@@ -6,7 +6,7 @@ from decimal import Decimal as D
 from pathlib import Path
 
 from ledger.bridges import finish_bridge, reconciliation_bridges, component, render_report
-from ledger.filings import tenq_debt_terms
+from ledger.filings import proxy_preferred_outstanding, tenq_debt_terms, tenq_subsequent_repurchases
 from ledger.fetch import RAW
 from ledger.reconcile import Check, run
 
@@ -102,6 +102,51 @@ class BridgeTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'debt|principal'):
                 tenq_debt_terms(broken)
 
+    def test_every_gap_stays_open_with_a_one_line_reason(self):
+        for b in self.bridges:
+            self.assertFalse(b['raw_within'])
+            self.assertTrue(b['open_reason'])
+            self.assertNotIn('\n', b['open_reason'])
+        self.assertEqual(self.by_id['strc-funding-2026-09-21']['filed_evidence'], [])
+
+    def test_q1_10q_direct_stre_figure_disagrees_with_june_10q(self):
+        b = self.by_id['stre-2026-03']
+        shares, cash = b['filed_evidence']
+        for e in (shares, cash):
+            self.assertEqual((e['form'], e['accession'], e['filing_date']),
+                             ('10-Q', '0001050446-26-000031', '2026-05-06'))
+        self.assertEqual(shares['filed'], 7750000)
+        self.assertTrue(shares['consistent'])
+        self.assertEqual(cash['filed'], D(22895000))
+        self.assertFalse(cash['consistent'])
+        self.assertIn('553,000 USD', cash['note'])
+        self.assertEqual(b['reported'], D(22342000))  # raw check keeps the June 10-Q derivation
+
+    def test_july_repurchases_cap_entitled_shares_below_reported_funding(self):
+        b = self.by_id['strc-funding-2026-08-17']
+        (e,) = b['filed_evidence']
+        self.assertEqual((e['form'], e['accession'], e['filing_date']),
+                         ('10-Q', '0001050446-26-000044', '2026-08-03'))
+        self.assertEqual(e['filed'], 288930)
+        self.assertTrue(e['consistent'])
+        most = 104894705 - 288930
+        self.assertIn(f'{most:,} shares', e['note'])
+        self.assertLess(most * D('0.5'), b['reported'] - b['rounding_uncertainty'])
+
+    def test_proxy_september_share_count_sits_inside_modeled_range(self):
+        (e,) = self.by_id['strc-funding-2026-10-19']['filed_evidence']
+        self.assertEqual((e['form'], e['accession'], e['filing_date']),
+                         ('DEF 14A', '0001193125-26-413159', '2026-10-05'))
+        self.assertEqual(e['filed'], 94558175)
+        self.assertEqual((e['model_low'], e['model_high']), (93161913, 94933151))
+        self.assertTrue(e['consistent'])
+
+    def test_new_filing_parsers_reject_missing_evidence(self):
+        with self.assertRaisesRegex(ValueError, 'share basis'):
+            proxy_preferred_outstanding('<p>no table</p>')
+        with self.assertRaisesRegex(ValueError, 'repurchase'):
+            tenq_subsequent_repurchases('<p>no sentence</p>', 'STRC')
+
     def test_signed_residuals_do_not_clamp_or_absorb_rounding(self):
         c = Check('synthetic', 'fixture', '2026-01-01', D(10), D(20), D(30), 'USD')
         b = finish_bridge(c, 'fixture', D(1), [component('example', 'model', D(20), D(30), {}, [])], {}, ['Unknown'])
@@ -119,3 +164,5 @@ class BridgeTests(unittest.TestCase):
             self.assertIn('Unknown residual: 20,490.375 .. 925,932.875 USD', report)
             self.assertIn('Settlement verified: False', report)
             self.assertIn('not observed FX', report)
+            self.assertEqual(report.count('  Open: '), 5)
+            self.assertIn('Filed (DEF 14A 0001193125-26-413159, 2026-10-05)', report)

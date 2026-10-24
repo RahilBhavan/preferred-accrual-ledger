@@ -192,6 +192,31 @@ def tenq_cash_dividends_paid(raw) -> dict[str, tuple[int, int]]:
     return out
 
 
+def tenq_quarter_dividends_paid(raw) -> dict[str, int]:
+    """Cash dividends paid in the quarter the 10-Q covers (first column), USD thousands."""
+    text = to_text(raw)
+    i = text.find("Cash Dividends Paid (in thousands)")
+    chunk = text[i:i + 900]
+    return {t: _number(re.search(rf"{t} Stock (?:\(1\) )?\$? ?([\d,]+)", chunk).group(1)) for t in TICKERS}
+
+
+def tenq_subsequent_repurchases(raw, ticker: str) -> tuple[dt.date, dt.date, int]:
+    """'From <date> to <date>, we repurchased N shares of <ticker> Stock' after quarter end."""
+    m = re.search(rf"From ({DATE_RE}) to ({DATE_RE}), we repurchased ([\d,]+) shares of {ticker} Stock", to_text(raw))
+    if m is None:
+        raise ValueError(f"no subsequent {ticker} repurchase sentence")
+    return parse_date(m.group(1)), parse_date(m.group(2)), _number(m.group(3))
+
+
+def proxy_preferred_outstanding(raw) -> tuple[dt.date, dict[str, int]]:
+    """Share counts behind the proxy's beneficial-ownership percentages, and their date."""
+    m = re.search(rf"Percentages have been calculated based on (.*?) outstanding as of ({DATE_RE})", to_text(raw))
+    if m is None:
+        raise ValueError("no beneficial-ownership share basis")
+    shares = {t: _number(n) for n, t in re.findall(r"([\d,]+) shares of (STR\w) Stock", m.group(1))}
+    return parse_date(m.group(2)), shares
+
+
 # ------------------------------------------------------------------ ECB ----
 
 def ecb_rates(raw) -> dict[dt.date, Decimal]:

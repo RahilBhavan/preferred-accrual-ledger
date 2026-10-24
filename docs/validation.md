@@ -9,7 +9,7 @@ python3 scripts/figure.py
 python3 -m compileall -q ledger scripts tests
 ```
 
-Observed: **50 tests passed** (43 before the 2026-10-22 reader fixes), **44 source bodies** matched the committed hash/size inventory, and **ten demo outputs** had identical hashes on consecutive runs. `validate.py` checks the exact required outputs, not unrelated local files. Exact hashes and commands are in [validation.json](validation.json).
+Observed: **55 tests passed** (50 before the gap cross-checks, 43 before the 2026-10-22 reader fixes), **45 source bodies** matched the committed hash/size inventory, and **ten demo outputs** had identical hashes on consecutive runs. `validate.py` checks the exact required outputs, not unrelated local files. Exact hashes and commands are in [validation.json](validation.json).
 
 Both current and approved scenarios reproduce. Current produces 37 events and 30 schedule rows through March 2027; approved produces 72 events and 438 rows. Both retain the same historical reconciliation: 11 of 16 numerical comparisons within source rounding tolerance, with five gaps documented in [audit](audit.md). All 30 conditional November amount/date rows match; this does not establish approval of daily terms.
 

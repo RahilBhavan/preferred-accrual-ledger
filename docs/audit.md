@@ -49,6 +49,20 @@ Plus modeled STRC           = 56.474067125–57.379509625 USD millions
 
 That sensitivity overlaps $57.4m at its $0.05m rounding tolerance. It is a plausible explanation, **not an observed allocation or a new reconciled aggregate check**: intervening conversions, special interest and actual cash dates are not established here. The raw preferred-only comparison remains outside tolerance. September 28–October 4 funding also includes interest; its existing numerical overlap does not independently validate settlement.
 
+## Primary-source search, 2026-10-22
+
+Each gap was searched against Strategy's EDGAR filings (CIK 0001050446) filed by the cutoff. None closed. The filed figures found are emitted as `filed_evidence` on each bridge; none changes a raw check.
+
+| Gap | Filed figure checked | Source | Result | Why it stays open |
+|---|---|---|---|---|
+| STRE Q1 | Q1 STRE cash dividends paid: $22,895 thousand. STRE shares issued at March 31: 7,750,000 | 10-Q, 0001050446-26-000031, filed 2026-05-06 | Shares match the model. Cash is $553 thousand above the June 10-Q's six-month less three-month figure ($22,342 thousand) | No filing gives the USD/EUR rate paid, and the two 10-Qs disagree |
+| STRE Q2 | STRE shares issued at March 31: 7,750,000 | 10-Q, 0001050446-26-000031, filed 2026-05-06 | Matches the June count | No filing gives the USD/EUR rate paid on June 30 |
+| STRC August 17 | 288,930 STRC shares repurchased July 1 to July 24 | 10-Q, 0001050446-26-000044, filed 2026-08-03 | At most 104,605,775 shares were entitled on July 31, worth $52,302,887.50, below $52.4m less rounding | Funding exceeds the largest entitlement the filings allow |
+| September 14 to 20 | None found | | | Needs August 31 STRC record shares and the debt interest actually paid |
+| STRC October 15 | 94,558,175 STRC shares outstanding at September 15 | DEF 14A, 0001193125-26-413159, filed 2026-10-05 | Inside the modeled 93,161,913 to 94,933,151 range | Needs September 30 STRC shares; the Q3 2026 10-Q was not on EDGAR on 2026-10-22 |
+
+The STRE Q1 disagreement is between two filings, so this repository keeps the June 10-Q derivation in the raw check and reports the March figure beside it. Neither is adjusted.
+
 ## Review boundaries
 
 The sweep covered correctness, error handling, security, accessibility (CLI/docs only), performance, dead code and project conventions. No measured performance defect or exploitable security defect survived the review. This is not a security certification. One T3 read-only review independently reproduced the late-declaration defect and the five gaps; the parent implemented and verified fixes.
