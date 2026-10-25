@@ -24,7 +24,7 @@ An offline event-replay tool for Strategy's STRF, STRC, STRE, STRK and STRD divi
 
 ## Run it
 
-Python 3.12+; local validation uses Python 3.14.7 and CI pins Python 3.14.0. Standard library only. From a fresh clone:
+Python 3.12+. The 55 tests also passed on Python 3.12.14. Local validation uses Python 3.14.7 and CI pins Python 3.14.0. Standard library only. From a fresh clone:
 
 ```bash
 git clone https://github.com/RahilBhavan/preferred-accrual-ledger.git
@@ -81,11 +81,11 @@ cross-checks (`filed_evidence`) and an `open_reason`. See
 - `provenance/`: source URL/date/hash inventories.
 - `tests/`: real-source checks and replay invariants.
 - `docs/`: scope, terms, reconciliation and validation.
+- `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `design/`, `.githooks/`: instructions, design tokens and a pre-commit size check for the coding agents that work in this repository. The code does not use them.
 
 ## Documentation
 
 - [Public design system](DESIGN.md): Rahil Design 3.3.0, shared tokens and visual review rules.
-
 - [Scope and acceptance](docs/spec.md): local v1 contract.
 - [Terms and limitations](docs/terms.md): schedules, scenarios and arrears boundary.
 - [Reconciliation](docs/reconciliation.md): unresolved mismatches and provenance.
