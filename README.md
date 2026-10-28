@@ -13,7 +13,7 @@ An offline event-replay tool for Strategy's STRF, STRC, STRE, STRK and STRD divi
 - Replays 37 sourced events from a June 30 opening balance under existing terms and emits dated schedules through March 2027 (`results/current/schedule.csv`). Every seeded row has `status=assumed_settled`; `paid` needs a supplied payment event. `basis` says whether the amount was `declared` or `projected` from the terms.
 - Answers "what is due in this window" with `--from/--to` or `--next-days N`, filtered on payment date.
 - Shows each row's `payment_form` (`cash`, or `election_unknown` for undeclared STRK, which may be paid in Class A stock) and the share change since the previous record date with the weekly 8-Ks that report it. STRC record-date shares fall from 104,894,705 (June 30) to 85,982,656 (October 31): 18,912,049 shares of reported repurchases, each dated at its 8-K period end.
-- Tests all 30 rows of the conditional November STRC daily table. Daily terms are available only with `--scenario approved`; the October 28 vote remains pending at the cutoff.
+- Tests all 30 rows of the conditional November STRC daily table. Daily terms are available only with `--scenario approved`; the October 28 vote was pending at the October 21 cutoff. Strategy's [8-K filed October 28](https://www.sec.gov/Archives/edgar/data/1050446/000119312526435451/mstr-20261028.htm) reports that, on preliminary results, the requisite vote was obtained, subject to filing and effectiveness of the amended certificates (STRC daily from November 1, 2026; STRF, STRK and STRD from January 1, 2027, matching the approved scenario). The frozen outputs are unchanged; the approved scenario already assumes this outcome.
 - Reports 11 of 16 aggregate reconciliation checks within source rounding tolerance (`reconciliation.json`). The five that miss stay open. Each lists the filed figures checked against it, with form, accession number and filing date, and a one-line reason it cannot close yet.
 - Found that Strategy's two 2026 10-Qs disagree on Q1 STRE cash dividends: the 10-Q for the quarter ended March 31 reports $22,895 thousand, while the June 30 10-Q's six-month less three-month figures give $22,342 thousand, a $553 thousand difference (`bridges` in `reconciliation.json`).
 - Rejects duplicate/conflicting IDs, supports idempotent JSONL append/reload, and tests record-date entitlement, compounding, step-up caps and undeclared STRD forfeiture.
@@ -93,6 +93,7 @@ cross-checks (`filed_evidence`) and an `open_reason`. See
 - [Correctness review](docs/audit.md): proven fixes and all five aggregate gaps.
 - [Consumer contract](docs/contracts.md): portable source and output formats for other tools.
 - [Publication receipt](docs/publication.md): commit, clean-clone and CI evidence.
+- [Related project: strc-rate-controller](https://github.com/RahilBhavan/strc-rate-controller): the filed STRC monthly rate decisions whose dividend schedules this ledger replays.
 
 ## Sources
 

@@ -1,6 +1,6 @@
 # Correctness and source review
 
-Publication review of the preserved v1 (`df21cf6`). Financial evidence stays frozen at **2026-10-21**; source fetch dates are separate in `provenance/`. This review does not update the October 28 proposal to an enacted term.
+Publication review of the preserved v1 (`df21cf6`). Financial evidence stays frozen at **2026-10-21**; source fetch dates are separate in `provenance/`. This review does not update the October 28 proposal to an enacted term. A later 8-K ([filed 2026-10-28](https://www.sec.gov/Archives/edgar/data/1050446/000119312526435451/mstr-20261028.htm)) reports preliminary approval; effectiveness of the amended certificates is not yet evidenced here.
 
 ## Proven repairs
 
